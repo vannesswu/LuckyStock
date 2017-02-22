@@ -1,0 +1,6 @@
+framework module Pods_LuckyStock {
+  umbrella header "Pods-LuckyStock-umbrella.h"
+
+  export *
+  module * { export * }
+}
