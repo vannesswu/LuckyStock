@@ -37,6 +37,14 @@ extension String {
         }))
         return nString
     }
+    func return0to9() -> String {
+        let nString = String(self.characters.filter({ (character:Character) -> Bool in
+            if character >= "0" && character <= "9" || character == "."{
+                return true
+            } else {return false }
+        }))
+        return nString
+    }
 }
 
 extension UIColor {
@@ -73,6 +81,10 @@ extension UIColor {
     }()
     static let valid = {
         return UIColor(r: 47, g: 68, b: 86)
+    }()
+    
+    static let buyRed = {
+        return UIColor(r: 247, g: 70, b: 77)
     }()
     
 }
@@ -145,3 +157,9 @@ class HearderLabel:UILabel {
     
 }
 
+extension UIActivityIndicatorView {
+    static let spinner: UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        return aiv
+    }()
+}

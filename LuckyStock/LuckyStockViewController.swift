@@ -13,9 +13,10 @@ import UserNotifications
 class LuckyStockViewController: UIViewController {
 
     let cellId = "cellId"
-    let headerId = "headerId"
+    let headerId = "headevar"
     var luckyStocks = [LuckyStock]()
-    
+    var filterStocks = [LuckyStock]()
+
     lazy var stockSettingLauncher: StockSettingLauncher = {
         let launcher = StockSettingLauncher()
         return launcher
@@ -46,6 +47,11 @@ class LuckyStockViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "設定", style: UIBarButtonItemStyle.plain, target: self, action: #selector(setting))
         navigationItem.rightBarButtonItem?.tintColor = UIColor.white
         
+        let backBarButtonItem = UIBarButtonItem(title: "回前頁", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
+        backBarButtonItem.setTitleTextAttributes([NSForegroundColorAttributeName:UIColor.white], for: .normal)
+        self.navigationController?.navigationBar.tintColor = UIColor.white
+        navigationItem.backBarButtonItem = backBarButtonItem
+        
         
         
         view.addSubview(stockTabeleView)
@@ -53,10 +59,7 @@ class LuckyStockViewController: UIViewController {
         
         Service.shareinstance.getStockInBackground(baseurl: myURLString) { (stocks:[LuckyStock], error:Error?) in
             self.luckyStocks = stocks
-            self.stockTabeleView.reloadData()
-            self.sendNotify(stocks: stocks) { (bool:Bool) in
-                
-            }
+            self.handleUserSetting()
         }
         // 1 Request permission
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
@@ -71,54 +74,103 @@ class LuckyStockViewController: UIViewController {
     }
     
     func setting() {
+        stockSettingLauncher = StockSettingLauncher()
+        stockSettingLauncher.delegateController = self
        stockSettingLauncher.showSetting()
     }
     
-    func sendNotify(stocks:[LuckyStock], completion: @escaping (_ success:Bool)->()) {
-        var matchStocks = judgeStockMatchTheConditions(stocks)
-        let date = NSDate()
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        let today = formatter.string(from: date as Date)
-        
-        
-        
-        for stock in matchStocks! {
-            let magicContent = UNMutableNotificationContent()
-            magicContent.title = "股票申購通知"
-            magicContent.subtitle = "符合條件股票: \(stock.name ?? "")"
-            magicContent.body = "承銷價:\(stock.sellPrice ?? "") 參考市價:\(stock.marketPrice ?? "") 溢價差:\(stock.profit ?? "")"
-            magicContent.badge = 1
-            let notifTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 20, repeats: false)
-            
-       //     let request = UNNotificationRequest(identifier: "\(today) \(stock.name ?? "")", content: magicContent, trigger: notifTrigger)
-            
-            let request = UNNotificationRequest(identifier: "1", content: magicContent, trigger: notifTrigger)
-            
-            UNUserNotificationCenter.current().add(request) { (error) in
-                if error != nil {
-                    print("\(error)")
-                    completion(false)
-                } else {
-                    completion(true)
-                }
-            }
-         }
-        }
+//    func sendNotify(stocks:[LuckyStock], completion: @escaping (_ success:Bool)->()) {
+// //       var matchStocks = judgeStockMatchTheConditions(stocks)
+//        let date = NSDate()
+//        let formatter = DateFormatter()
+//        formatter.dateStyle = .short
+//        let today = formatter.string(from: date as Date)
+//        
+//        
+//        
+//        for stock in matchStocks {
+//            let magicContent = UNMutableNotificationContent()
+//            magicContent.title = "股票申購通知"
+//            magicContent.subtitle = "符合條件股票: \(stock.name ?? "")"
+//            magicContent.body = "承銷價:\(stock.sellPrice ?? "") 參考市價:\(stock.marketPrice ?? "") 溢價差:\(stock.profit ?? "")"
+//            magicContent.badge = 1
+//            let notifTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 20, repeats: false)
+//            let request = UNNotificationRequest(identifier: "1", content: magicContent, trigger: notifTrigger)
+//            
+//            UNUserNotificationCenter.current().add(request) { (error) in
+//                if error != nil {
+//                    print("\(error)")
+//                    completion(false)
+//                } else {
+//                    completion(true)
+//                }
+//            }
+//         }
+//        }
     
-
-    func judgeStockMatchTheConditions(_ stocks:[LuckyStock]) -> [LuckyStock]? {
+    func handleUserSetting() {
+       let userDefault = UserDefaults.standard
         
-        return stocks.filter({ (luckyStock:LuckyStock) -> Bool in
-            if let profit = Double(luckyStock.profit!) {
-               return  profit > 10.0
-            }
-            return false
-        })
-        
+       judgeStockMatchTheConditions()
+        if let isNeedRemind = userDefault.object(forKey: "isNeedRemind") as? Bool {
+        settingNotify(isNeedRemind)
+        }
+       stockTabeleView.reloadData()
         
     }
+    
+    
+    
+
+    func judgeStockMatchTheConditions() {
         
+        let userDefault = UserDefaults.standard
+        filterStocks = luckyStocks
+        if let userSellPrice = userDefault.string(forKey: "sellPrice"), userSellPrice != "" {
+            filterStocks = filterStocks.filter({ (luckyStock:LuckyStock) -> Bool in
+                if let sellPrice = Double(luckyStock.sellPrice!) {
+                    return  sellPrice <= Double(userSellPrice)!
+                }
+                return false
+            })
+        }
+        if let userProfitPrice = userDefault.string(forKey: "profitPrice"), userProfitPrice != "" {
+            filterStocks = filterStocks.filter({ (luckyStock:LuckyStock) -> Bool in
+                if let profitPrice = Double(luckyStock.profit!) {
+                    return  profitPrice >= Double(userProfitPrice)!
+                }
+                return false
+            })
+        }
+    }
+    func settingNotify(_ needRemind:Bool) {
+        
+        if needRemind {
+            if let remindTime = UserDefaults.standard.object(forKey: "remindTime") as? Date {
+                let stockContent = UNMutableNotificationContent()
+                stockContent.title = "股票申購通知"
+                stockContent.body = "點擊查看是否有新申購股票符合條件"
+                //            stockContent.body = "承銷價:\(stock.sellPrice ?? "") 參考市價:\(stock.marketPrice ?? "") 溢價差:\(stock.profit ?? "")"
+                stockContent.badge = 1
+                
+                let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: remindTime)
+                let notifTrigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+                
+                let request = UNNotificationRequest(identifier: "stockNotify", content: stockContent, trigger: notifTrigger)
+                UNUserNotificationCenter.current().add(request) { (error) in
+                    if error != nil {
+                        print("\(error)")
+                    }
+                }
+            }
+        } else {
+            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        }
+        
+    }
+    
+    
+    
     
     override func viewWillLayoutSubviews() {
         stockTabeleView.fillSuperview()
@@ -135,7 +187,7 @@ extension LuckyStockViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return luckyStocks.count
+        return filterStocks.count
     }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerId)
@@ -144,7 +196,8 @@ extension LuckyStockViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! StockCell
-        cell.stock = luckyStocks[indexPath.row]
+        cell.delegateController = self
+        cell.stock = filterStocks[indexPath.row]
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

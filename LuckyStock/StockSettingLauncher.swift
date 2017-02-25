@@ -15,7 +15,9 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         super.init()
         
     }
-    
+    var delegateController:LuckyStockViewController?
+    let stockCompanies = LuckyStock.stockCompaniesArray
+    var didScrolled = false
     let blackView = UIView()
     let headerView: UIView = {
         let view = UIView()
@@ -31,7 +33,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
 
     
     
-    
+    // MARK: show mainView
     func showSetting() {
         // remove the handleView
         //   if conditionDelegate.ha
@@ -90,7 +92,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         }
         
     }
-    
+    // MARK: setupHeaderView
     func setupHeaderView() {
         SettingView.addSubview(headerView)
         headerView.anchor(SettingView.topAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 44+20)
@@ -108,10 +110,25 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
     }
     let sellPriceLabel = TitleLabel()
     let profitLabel = TitleLabel()
-    let sellTextfield = NumberTextField()
-    let profitTextfield = NumberTextField()
+    let sellTextfield:NumberTextField = {
+        let tf = NumberTextField()
+        if let sellPrice = UserDefaults.standard.object(forKey: "sellPrice") as? String {
+            tf.text = sellPrice
+        }
+        return tf
+    }()
+    let profitTextfield:NumberTextField = {
+        let tf = NumberTextField()
+        if let profitPrice = UserDefaults.standard.object(forKey: "profitPrice") as? String {
+            tf.text = profitPrice
+        }
+        return tf
+    }()
+
     
     var filterView = UIView()
+    
+    // MARK: setupFilterView
     
     func setupFilterView(){
         let separatorView = SeparatorView()
@@ -134,9 +151,6 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         sellTextfield.delegate = self
         let halfWidth = SettingView.frame.width/2
         
-        
-        
-        
         filterView.addSubview(sellPriceLabel)
         filterView.addSubview(sellTextfield)
         filterView.addSubview(profitLabel)
@@ -148,8 +162,6 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         profitTextfield.anchor(profitLabel.topAnchor, left: profitLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
         separatorView.anchor(nil, left: filterView.leftAnchor, bottom: filterView.bottomAnchor, right: filterView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         
-        
-        
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
@@ -157,6 +169,17 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         textField.resignFirstResponder()
         return true;
     }
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        // make sure userid in legal range
+         textField.text = textField.text?.return0to9()
+        
+    
+    }
+    
+    
+    
+    
+    // MARK: setupCompanyView
     
     var companyView = UIView()
     let companyLabel = TitleLabel()
@@ -164,7 +187,9 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
     lazy var menuButton:UIButton = {
         let btn = UIButton()
         btn.addTarget(self, action: #selector(showCompany), for: .touchUpInside)
-        btn.setTitle("請選擇", for: .normal)
+        if let company = UserDefaults.standard.object(forKey: "stockCompany") as? String {
+            btn.setTitle(company, for: .normal)
+        } else { btn.setTitle("請選擇", for: .normal) }
         btn.setTitleColor(UIColor.darkText, for: .normal)
         let separatorView = SeparatorView()
         btn.addSubview(separatorView)
@@ -186,54 +211,126 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         
         
         // company label and menu
-   //     companyView.addSubview(companyLabel)
         companyView.addSubview(menuButton)
         companyView.addSubview(separatorView)
-//        companyLabel.text = "證券公司"
-//        companyLabel.textAlignment = .center
-//        companyLabel.anchor(companyHeaderLabel.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 50)
         menuButton.anchor(companyHeaderLabel.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 50)
         menuButton.anchorCenterXToSuperview()
         
         separatorView.anchor(nil, left: companyView.leftAnchor, bottom: companyView.bottomAnchor, right: companyView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         
     }
+    
+    let secondBlackView = UIView()
+    lazy var companyPickerView:UIPickerView = {
+        let pv = UIPickerView()
+        pv.dataSource = self
+        pv.delegate = self
+        pv.backgroundColor = UIColor.white
+        pv.alpha = 0.95
+        return pv
+    }()
+    var buttonTitle = ""
+    let menuView = UIView()
+    lazy var selectCompanyButton:UIButton = {
+        let btn = UIButton()
+        btn.setTitle("OK", for: .normal)
+        btn.layer.cornerRadius = 15
+        btn.clipsToBounds = true
+        btn.backgroundColor = UIColor.mainBlue
+        btn.addTarget(self, action: #selector(handleDismissCompany), for: .touchUpInside)
+        return btn
+    }()
+    
     func showCompany() {
-        
+        if let window = UIApplication.shared.keyWindow {
+            secondBlackView.backgroundColor = UIColor(white: 0, alpha: 0.5)
+            secondBlackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDismissCompany)))
+            menuView.frame = CGRect(x: window.frame.width/4, y: -window.frame.height, width: window.frame.width/2, height: 300)
+            menuView.backgroundColor = UIColor.white
+            
+            window.addSubview(secondBlackView)
+            window.addSubview(menuView)
+            setupCompanyPickerView()
+            setupSelectedcompanyButton()
+       //     window.addSubview(companyPickerView)
+            secondBlackView.frame = window.frame
+            secondBlackView.alpha = 0
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                
+                self.secondBlackView.alpha = 1
+                self.menuView.center = window.center
+            }, completion: nil)
+            
+            
+            
+        }
+    }
+    func setupCompanyPickerView(){
+        menuView.addSubview(companyPickerView)
+        companyPickerView.anchor(menuView.topAnchor, left: menuView.leftAnchor, bottom: nil, right: menuView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 150)
         
     }
+    func setupSelectedcompanyButton() {
+        menuView.addSubview(selectCompanyButton)
+        selectCompanyButton.anchor(companyPickerView.bottomAnchor, left: nil, bottom: menuView.bottomAnchor, right: nil, topConstant: 10, leftConstant: 0, bottomConstant: 10, rightConstant: 0, widthConstant: 70, heightConstant: 30)
+        selectCompanyButton.anchorCenterXToSuperview()
+    }
+    
+    
+    func handleDismissCompany() {
+        buttonTitle = didScrolled ? buttonTitle : "元大"
+        menuButton.setTitle(buttonTitle, for: .normal)
+         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            
+            self.secondBlackView.alpha = 0
+            
+            if let window = UIApplication.shared.keyWindow {
+                self.menuView.frame = CGRect(x: window.frame.width/4, y: -window.frame.height/2, width: window.frame.width/2, height: 300)
+            }
+            
+        }) { (completed: Bool) in
+            if completed {
+                self.secondBlackView.removeFromSuperview()
+                self.menuView.removeFromSuperview()
+            }
+    }
+        
+    }
+
+     // MARK: setupRemindView
     
     var remindView = UIView()
     let remindHeaderLabel = HearderLabel()
     let someSwitch = UISwitch()
     let remindSwitch:UISwitch = {
         let switcher = UISwitch(frame:.zero)
-        switcher.isOn = true
-        switcher.setOn(true, animated: false)
+        if let switchStatus = UserDefaults.standard.object(forKey: "isNeedRemind") as? Bool {
+            switcher.isOn = switchStatus
+        }
+        else { switcher.isOn = true }
         switcher.contentMode = .scaleToFill
         return switcher
     }()
-    let datePicker:UIDatePicker = {
+    lazy var datePicker:UIDatePicker = {
         let dp = UIDatePicker()
         dp.datePickerMode = .time
         dp.locale = Locale(identifier: "zh_TW")
         
-        let formatter = DateFormatter()
-        
-        formatter.dateFormat = "HH:mm"
-        // 可以選擇的最早日期時間
-        let initialTime = formatter.date(from: "09:00")
-        dp.date = initialTime!
-        
-        
-        
-        
-        
-        
-        
+        dp.date = self.remindTime!
         return dp
     }()
-    
+    var remindTime:Date? = {
+        if let storetime = UserDefaults.standard.object(forKey: "remindTime") as? Date {
+         return storetime
+        }
+        else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm"
+            formatter.locale = Locale(identifier: "zh_TW")
+            let initialTime = formatter.date(from: "09:00")
+            return initialTime
+        }
+    }()
     
     
     func setupRemindView() {
@@ -243,7 +340,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         
         remindView.addSubview(remindHeaderLabel)
         remindView.addSubview(remindSwitch)
-        remindSwitch.addTarget(self, action: #selector(switchValueDidChange), for: .valueChanged)
+        remindSwitch.addTarget(self, action: #selector(switchChange), for: .valueChanged)
         remindHeaderLabel.text = "每日提醒"
         remindHeaderLabel.anchor(remindView.topAnchor, left: remindView.leftAnchor , bottom: nil, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
         remindSwitch.anchor(remindHeaderLabel.topAnchor, left: nil , bottom: nil, right: remindView.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 15, widthConstant: 40, heightConstant: 40)
@@ -251,7 +348,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
        
         remindView.addSubview(datePicker)
         datePicker.addTarget(self, action: #selector(datePickerChanged), for: .valueChanged)
-        datePicker.anchor(remindHeaderLabel.bottomAnchor, left: remindView.leftAnchor, bottom: nil, right: remindView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 90)
+        datePicker.anchor(remindHeaderLabel.bottomAnchor, left: remindView.leftAnchor, bottom: nil, right: remindView.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 90)
         
         
         remindView.addSubview(separatorView)
@@ -259,24 +356,23 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         
     
     }
-    func switchValueDidChange(sender:UISwitch) {
-        if (sender.isOn == true){
-            print("on")
-        }
-        else{
-            print("off")
-        }
+    func switchChange( switcher:UISwitch){
         
     }
+    
+ //   var remindTime:Date
     func datePickerChanged(datePicker:UIDatePicker) {
         // 設置要顯示在 UILabel 的日期時間格式
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         
-       
+       remindTime = datePicker.date
        // myLabel.text = formatter.stringFromDate(
         //    datePicker.date)
     }
+    
+    
+    
     
     lazy var doneButton:UIButton = {
         let btn = UIButton()
@@ -291,34 +387,62 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
     
     func setupDoneButton() {
         SettingView.addSubview(doneButton)
-        doneButton.anchor(remindView.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 40)
+        doneButton.anchor(remindView.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 20, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 40)
         doneButton.anchorCenterXToSuperview()
         
         
     }
     
     func finishSetting() {
+   
+        let userDefault = UserDefaults.standard
         
+        // store the conditions
+        if let sellPrice = sellTextfield.text  {
+            userDefault.set(sellPrice, forKey: "sellPrice")
+            userDefault.synchronize()
+        }
+        if let profitPrice = profitTextfield.text {
+            userDefault.set(profitPrice, forKey: "profitPrice")
+            userDefault.synchronize()
+        }
+        if let company = menuButton.currentTitle, company != "請選擇" {
+        userDefault.set(company, forKey: "stockCompany")
+            userDefault.synchronize()
+        }
+        let isNeedRemind = remindSwitch.isOn
+        userDefault.set(isNeedRemind, forKey: "isNeedRemind")
+        userDefault.synchronize()
+        userDefault.set(datePicker.date, forKey: "remindTime")
+        userDefault.synchronize()
         
+        delegateController?.handleUserSetting()
+        handleDismiss()
     }
     
 }
 
 extension StockSettingLauncher : UIPickerViewDataSource, UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return 1
+        return stockCompanies.count
     }
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        
-        return ""
-    }
     
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        let title = stockCompanies[row]
+        let companyTitle = NSAttributedString(string: title, attributes: [NSFontAttributeName:UIFont(name: "Georgia", size: 18.0)!,NSForegroundColorAttributeName:UIColor.darkText])
+        return companyTitle
+    }
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 35
+    }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        
+        didScrolled = true
+        buttonTitle = stockCompanies[row]
+       // handleDismissCompany()
     }
     
     
