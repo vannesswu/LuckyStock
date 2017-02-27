@@ -124,7 +124,23 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         }
         return tf
     }()
-
+    let isHideOverDateStockLabel = TitleLabel()
+    
+    var tempIshideOverDateSetting = UserDefaults.isHideOverDateSetting()
+    lazy var confirmButton:UIButton = {
+        let btn = UIButton()
+        btn.layer.borderWidth = 4
+        btn.layer.borderColor = UIColor.selectGreen.cgColor
+        btn.setImage(self.tempIshideOverDateSetting ? #imageLiteral(resourceName: "confirm") : nil, for: .normal)
+        btn.addTarget(self, action: #selector(switchButtonImage), for: .touchUpInside)
+        return btn
+    }()
+    func switchButtonImage(){
+        tempIshideOverDateSetting = !tempIshideOverDateSetting
+    //     UserDefaults.standard.set(!UserDefaults.isHideOverDateSetting(), forKey: "isHideOverDateSetting")
+        confirmButton.setImage(tempIshideOverDateSetting ? #imageLiteral(resourceName: "confirm") : nil, for: .normal)
+    //     UserDefaults.standard.synchronize()
+    }
     
     var filterView = UIView()
     
@@ -134,7 +150,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         let separatorView = SeparatorView()
         filterView = UIView()
         SettingView.addSubview(filterView)
-        filterView.anchor(headerView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 150)
+        filterView.anchor(headerView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 160)
         
         // setting title view
         let titleLabel = HearderLabel()
@@ -147,6 +163,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         // setting filter condition view
         sellPriceLabel.text = "承銷價 小於: "
         profitLabel.text = "溢價差 大於: "
+        isHideOverDateStockLabel.text = "隱藏截止申購:"
         profitTextfield.delegate = self
         sellTextfield.delegate = self
         let halfWidth = SettingView.frame.width/2
@@ -155,11 +172,18 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         filterView.addSubview(sellTextfield)
         filterView.addSubview(profitLabel)
         filterView.addSubview(profitTextfield)
+        filterView.addSubview(isHideOverDateStockLabel)
+        filterView.addSubview(confirmButton)
         filterView.addSubview(separatorView)
         sellPriceLabel.anchor(titleLabel.bottomAnchor, left: filterView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
         sellTextfield.anchor(sellPriceLabel.topAnchor, left: sellPriceLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
         profitLabel.anchor(sellPriceLabel.bottomAnchor, left: filterView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
         profitTextfield.anchor(profitLabel.topAnchor, left: profitLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
+        isHideOverDateStockLabel.anchor(profitLabel.bottomAnchor, left: profitLabel.leftAnchor, bottom: filterView.bottomAnchor, right: profitLabel.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        confirmButton.anchor(isHideOverDateStockLabel.topAnchor, left: isHideOverDateStockLabel.rightAnchor, bottom: nil , right: nil, topConstant: 5, leftConstant: halfWidth/2-12.5, bottomConstant: 0, rightConstant: 0, widthConstant: 25, heightConstant: 25)
+        
+        
+        
         separatorView.anchor(nil, left: filterView.leftAnchor, bottom: filterView.bottomAnchor, right: filterView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         
     }
@@ -410,6 +434,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         userDefault.set(company, forKey: "stockCompany")
             userDefault.synchronize()
         }
+        userDefault.set(tempIshideOverDateSetting, forKey: "isHideOverDateSetting")
         let isNeedRemind = remindSwitch.isOn
         userDefault.set(isNeedRemind, forKey: "isNeedRemind")
         userDefault.synchronize()

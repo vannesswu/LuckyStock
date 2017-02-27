@@ -22,8 +22,8 @@ class StockCell: UITableViewCell {
            profitLabel.text = stock?.profit ?? ""
            duringDateLabel.text = "申購期間: \(stock?.during ?? "")"
            startDateLabel.text = "抽籤日期: \(stock?.startDate ?? "")"
-            if let during = stock?.during {
-                nameLabel.backgroundColor = judgeStatus(during)
+            if let status = stock?.status {
+                nameLabel.backgroundColor = judgeStatus(status)
             }
             
             
@@ -31,32 +31,46 @@ class StockCell: UITableViewCell {
         
         
     }
-    func judgeStatus(_ during:String) -> UIColor {
+    func judgeStatus(_ status:LuckyStock.StockStatus) -> UIColor {
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
- //       formatter.timeZone = TimeZone.current
-        formatter.locale = Locale(identifier: "zh_TW")
-        let date = Date()
-        let today = formatter.string(from: date as Date)
-        let componentInToday = today.components(separatedBy: "/")
-        let yearInToday = componentInToday[0]
-        let monthInToday = componentInToday[1]
-        let dayInToday = componentInToday[2]
-
-        let duringDate = during.components(separatedBy: "~")
-        let startDateString = duringDate[0]
-        let endDateString = duringDate[1]
-        let startDate = formatter.date(from: "\(yearInToday)/\(startDateString)")
-        let endDate = formatter.date(from: "\(yearInToday)/\(endDateString)")
-        
-        if date  < startDate! {
+        switch status {
+        case.notyet :
+            buyButton.isHidden = true
             return UIColor.adoptGreen
-        } else if date > startDate! && date < endDate! {
+        case.onsell :
+            buyButton.isHidden = false
             return UIColor.adoptRed
-        } else {
+        case.expired :
+            buyButton.isHidden = true
             return UIColor.midleGray
         }
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy/MM/dd"
+// //       formatter.timeZone = TimeZone.current
+//        formatter.locale = Locale(identifier: "zh_TW")
+//        let date = Date()
+//        let today = formatter.string(from: date as Date)
+//        let componentInToday = today.components(separatedBy: "/")
+//        let yearInToday = componentInToday[0]
+//       // let monthInToday = componentInToday[1]
+//       // let dayInToday = componentInToday[2]
+//
+//        let duringDate = during.components(separatedBy: "~")
+//        let startDateString = duringDate[0]
+//        let endDateString = duringDate[1]
+//        let startDate = formatter.date(from: "\(yearInToday)/\(startDateString)")
+//        let endDate = formatter.date(from: "\(yearInToday)/\(endDateString)")
+//        
+//        if date  < startDate! {
+//            buyButton.isHidden = true
+//            return UIColor.adoptGreen
+//        } else if date > startDate! && date < endDate! {
+//            buyButton.isHidden = false
+//            return UIColor.adoptRed
+//        } else {
+//            buyButton.isHidden = true
+//            return UIColor.midleGray
+//        }
     }
     
     
@@ -118,6 +132,12 @@ class StockCell: UITableViewCell {
         btn.setTitleColor(UIColor.white, for: .normal)
         btn.backgroundColor = UIColor.buyRed
         btn.addTarget(self, action: #selector(goWebView), for: .touchUpInside)
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: -1.5, height: 1.5)
+        btn.layer.shadowOpacity = 0.8
+        btn.layer.shadowRadius = 1.0
+        
+        
         return btn
     }()
     
@@ -154,7 +174,7 @@ class StockCell: UITableViewCell {
     func goWebView() {
         
         if let company = UserDefaults.standard.object(forKey: "stockCompany") as? String {
-            let webViewController = CompanyViewController()
+            let webViewController = SecurityCompanyViewController()
             webViewController.company = company
             delegateController?.navigationController?.pushViewController(webViewController, animated: true)
         } else {

@@ -11,6 +11,7 @@ import Foundation
 class LuckyStock {
     
     var startDate:String?
+    var givenDate:String?
     var name:String?
     var number:String?
     var reason:String?
@@ -19,6 +20,11 @@ class LuckyStock {
     var sellPrice:String?
     var marketPrice:String?
     var profit:String?
+    var numberOfStockCanBuy:String?
+    var numberOfPeople:String?
+    var bingoRate:String?
+    var status:StockStatus?
+    
     let myURL = URL(string: "http://histock.tw/stock/public.aspx")
     
     init (_ stock:String) {
@@ -41,7 +47,8 @@ class LuckyStock {
         self.reason = separateString[2]
         
         self.during = separateString[3].substring(with: 1..<12)
-        
+        self.status = judgeStatus(during: self.during)
+        self.givenDate = separateString[3].substring(from: separateString[3].characters.count - 4)
         let amount = separateString[4]
         self.amount = amount.return1to9(with: amount)
         
@@ -55,13 +62,52 @@ class LuckyStock {
         //                let marketPrice = separateString[5].substring(from: (range3.upperBound))
         let marketPrice = separateString[5].substring(from: separateString[5].characters.count-7)
         self.marketPrice = marketPrice.return1to9(with: marketPrice)
+        
         //       }
         if self.sellPrice != nil && self.marketPrice != nil {
             if let sellprice = Double(self.sellPrice!), let marketprice = Double(self.marketPrice!) {
                 self.profit = String(format: "%.2f", marketprice - sellprice)
             }
+            if self.marketPrice == "" {
+                self.marketPrice = "無資料"
+                self.profit = "無資料"
+            }
         }
+        self.numberOfStockCanBuy = separateString[7]
+        self.numberOfPeople = separateString[8]
+        self.bingoRate = separateString[9]
+        
     }
+    
+    func judgeStatus(during:String?)-> StockStatus {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"
+        formatter.locale = Locale(identifier: "zh_TW")
+        let date = Date()
+        let today = formatter.string(from: date as Date)
+        let componentInToday = today.components(separatedBy: "/")
+        let yearInToday = componentInToday[0]
+        
+        if let duringDate = self.during?.components(separatedBy: "~")   {      let startDateString = duringDate[0]
+        let endDateString = duringDate[1]
+        let startDate = formatter.date(from: "\(yearInToday)/\(startDateString)")
+        let endDate = formatter.date(from: "\(yearInToday)/\(endDateString)")
+        
+        if date  < startDate! {
+            return StockStatus.notyet
+        } else if date > startDate! && date < endDate! {
+            return StockStatus.onsell
+        } else {
+            return StockStatus.expired
+        }
+        }
+        return StockStatus.notyet
+    }
+
+
+    
+    
+    
     
     static let stockCompaniesDict = ["元大":"http://www.yuanta.com.tw/pages/homepage/Security.aspx?Node=3ebfd711-ea07-417f-8723-83d73ebaa4ac",
      "凱基":"http://www.kgieworld.com.tw/stock/stock_6_6.aspx?findex=9",
@@ -88,7 +134,11 @@ class LuckyStock {
     
     static  let stockCompaniesArray = ["元大","凱基","富邦","永豐金","群益","元富","統一","日盛","兆豐","華南永昌","新光","國票","國泰","玉山","第一金","康和","中國信託","宏遠","大眾","合庫","其他"]
     
-    
+    enum StockStatus:String {
+        case notyet = "notyet"
+        case onsell = "onsell"
+        case expired = "expired"
+    }
     
     
 }

@@ -12,13 +12,16 @@
 		612113001E5D559500A0EC9F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 612112FF1E5D559500A0EC9F /* Assets.xcassets */; };
 		612113031E5D559500A0EC9F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 612113011E5D559500A0EC9F /* LaunchScreen.storyboard */; };
 		6121130C1E5D580200A0EC9F /* StockCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6121130B1E5D580200A0EC9F /* StockCell.swift */; };
+		613A88E51E649A06001F86BC /* CompanyInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613A88E41E649A06001F86BC /* CompanyInfoViewController.swift */; };
 		618BF2B11E5DFDB0008ED0CB /* LuckyStock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618BF2B01E5DFDB0008ED0CB /* LuckyStock.swift */; };
 		618BF2B31E5DFF6D008ED0CB /* UsefulExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618BF2B21E5DFF6D008ED0CB /* UsefulExtension.swift */; };
 		618BF2B71E5E710F008ED0CB /* StockHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618BF2B61E5E710F008ED0CB /* StockHeader.swift */; };
 		618BF2B91E5EB32E008ED0CB /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618BF2B81E5EB32E008ED0CB /* Service.swift */; };
 		61F854FF1E5F501E00287399 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 61F854FE1E5F501E00287399 /* GoogleService-Info.plist */; };
 		61F855011E600C5A00287399 /* StockSettingLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F855001E600C5A00287399 /* StockSettingLauncher.swift */; };
-		61F855031E61C72D00287399 /* CompanyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F855021E61C72C00287399 /* CompanyViewController.swift */; };
+		61F855031E61C72D00287399 /* SecurityCompanyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F855021E61C72C00287399 /* SecurityCompanyViewController.swift */; };
+		61F855051E63C81300287399 /* StockDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F855041E63C81300287399 /* StockDetailViewController.swift */; };
+		61F855071E63CABD00287399 /* StockDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F855061E63CABD00287399 /* StockDetailCell.swift */; };
 		8342619E6DB3CE8ADAA155C9 /* Pods_LuckyStock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3227FDA530EB6D4EBCDF1C6 /* Pods_LuckyStock.framework */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +35,7 @@
 		612113021E5D559500A0EC9F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		612113041E5D559500A0EC9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6121130B1E5D580200A0EC9F /* StockCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockCell.swift; sourceTree = "<group>"; };
+		613A88E41E649A06001F86BC /* CompanyInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompanyInfoViewController.swift; sourceTree = "<group>"; };
 		618BF2B01E5DFDB0008ED0CB /* LuckyStock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LuckyStock.swift; sourceTree = "<group>"; };
 		618BF2B21E5DFF6D008ED0CB /* UsefulExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsefulExtension.swift; sourceTree = "<group>"; };
 		618BF2B61E5E710F008ED0CB /* StockHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockHeader.swift; sourceTree = "<group>"; };
@@ -39,7 +43,9 @@
 		618BF2C41E5F40A6008ED0CB /* LuckyStock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LuckyStock.entitlements; sourceTree = "<group>"; };
 		61F854FE1E5F501E00287399 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		61F855001E600C5A00287399 /* StockSettingLauncher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockSettingLauncher.swift; sourceTree = "<group>"; };
-		61F855021E61C72C00287399 /* CompanyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompanyViewController.swift; sourceTree = "<group>"; };
+		61F855021E61C72C00287399 /* SecurityCompanyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityCompanyViewController.swift; sourceTree = "<group>"; };
+		61F855041E63C81300287399 /* StockDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockDetailViewController.swift; sourceTree = "<group>"; };
+		61F855061E63CABD00287399 /* StockDetailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockDetailCell.swift; sourceTree = "<group>"; };
 		C3227FDA530EB6D4EBCDF1C6 /* Pods_LuckyStock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LuckyStock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -77,12 +83,12 @@
 			isa = PBXGroup;
 			children = (
 				618BF2C41E5F40A6008ED0CB /* LuckyStock.entitlements */,
-				6121130A1E5D57DA00A0EC9F /* ViewController */,
 				618BF2B41E5E01B9008ED0CB /* Model */,
 				618BF2B51E5E02FE008ED0CB /* View */,
-				612112F81E5D559500A0EC9F /* AppDelegate.swift */,
+				6121130A1E5D57DA00A0EC9F /* ViewController */,
 				612113011E5D559500A0EC9F /* LaunchScreen.storyboard */,
 				618BF2B21E5DFF6D008ED0CB /* UsefulExtension.swift */,
+				612112F81E5D559500A0EC9F /* AppDelegate.swift */,
 				61F854FE1E5F501E00287399 /* GoogleService-Info.plist */,
 				612113041E5D559500A0EC9F /* Info.plist */,
 				612112FF1E5D559500A0EC9F /* Assets.xcassets */,
@@ -95,8 +101,10 @@
 			isa = PBXGroup;
 			children = (
 				612112FA1E5D559500A0EC9F /* LuckyStockViewController.swift */,
+				61F855041E63C81300287399 /* StockDetailViewController.swift */,
+				613A88E41E649A06001F86BC /* CompanyInfoViewController.swift */,
 				61F855001E600C5A00287399 /* StockSettingLauncher.swift */,
-				61F855021E61C72C00287399 /* CompanyViewController.swift */,
+				61F855021E61C72C00287399 /* SecurityCompanyViewController.swift */,
 			);
 			name = ViewController;
 			sourceTree = "<group>";
@@ -113,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				6121130B1E5D580200A0EC9F /* StockCell.swift */,
+				61F855061E63CABD00287399 /* StockDetailCell.swift */,
 				618BF2B61E5E710F008ED0CB /* StockHeader.swift */,
 			);
 			name = View;
@@ -264,12 +273,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61F855051E63C81300287399 /* StockDetailViewController.swift in Sources */,
 				61F855011E600C5A00287399 /* StockSettingLauncher.swift in Sources */,
 				612112FB1E5D559500A0EC9F /* LuckyStockViewController.swift in Sources */,
+				61F855071E63CABD00287399 /* StockDetailCell.swift in Sources */,
+				613A88E51E649A06001F86BC /* CompanyInfoViewController.swift in Sources */,
 				618BF2B91E5EB32E008ED0CB /* Service.swift in Sources */,
 				618BF2B71E5E710F008ED0CB /* StockHeader.swift in Sources */,
 				618BF2B31E5DFF6D008ED0CB /* UsefulExtension.swift in Sources */,
-				61F855031E61C72D00287399 /* CompanyViewController.swift in Sources */,
+				61F855031E61C72D00287399 /* SecurityCompanyViewController.swift in Sources */,
 				612112F91E5D559500A0EC9F /* AppDelegate.swift in Sources */,
 				6121130C1E5D580200A0EC9F /* StockCell.swift in Sources */,
 				618BF2B11E5DFDB0008ED0CB /* LuckyStock.swift in Sources */,

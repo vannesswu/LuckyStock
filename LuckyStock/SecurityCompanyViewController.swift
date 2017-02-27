@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 import LBTAComponents
-class CompanyViewController: UIViewController {
+class SecurityCompanyViewController: UIViewController {
     
     
     var company = ""
@@ -35,7 +35,7 @@ class CompanyViewController: UIViewController {
     }
 }
 
-extension CompanyViewController : UIWebViewDelegate{
+extension SecurityCompanyViewController : UIWebViewDelegate{
     
     func webViewDidStartLoad(_ webView: UIWebView) {
         

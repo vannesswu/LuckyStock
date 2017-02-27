@@ -163,3 +163,14 @@ extension UIActivityIndicatorView {
         return aiv
     }()
 }
+
+
+extension UserDefaults {
+    
+    static func isHideOverDateSetting() -> Bool {
+        if let bool = UserDefaults.standard.object(forKey: "isHideOverDateSetting") as? Bool {
+            return bool
+        }
+        return false
+    }
+}

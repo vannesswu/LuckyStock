@@ -57,7 +57,7 @@ class LuckyStockViewController: UIViewController {
         view.addSubview(stockTabeleView)
         let myURLString = "http://histock.tw/stock/public.aspx"
         
-        Service.shareinstance.getStockInBackground(baseurl: myURLString) { (stocks:[LuckyStock], error:Error?) in
+        Service.shareinstance.fetchWebStockData(baseurl: myURLString) { (stocks:[LuckyStock], error:Error?) in
             self.luckyStocks = stocks
             self.handleUserSetting()
         }
@@ -69,8 +69,6 @@ class LuckyStockViewController: UIViewController {
                 print("\(error?.localizedDescription)")
             }
         }
-        
-        
     }
     
     func setting() {
@@ -79,39 +77,12 @@ class LuckyStockViewController: UIViewController {
        stockSettingLauncher.showSetting()
     }
     
-//    func sendNotify(stocks:[LuckyStock], completion: @escaping (_ success:Bool)->()) {
-// //       var matchStocks = judgeStockMatchTheConditions(stocks)
-//        let date = NSDate()
-//        let formatter = DateFormatter()
-//        formatter.dateStyle = .short
-//        let today = formatter.string(from: date as Date)
-//        
-//        
-//        
-//        for stock in matchStocks {
-//            let magicContent = UNMutableNotificationContent()
-//            magicContent.title = "股票申購通知"
-//            magicContent.subtitle = "符合條件股票: \(stock.name ?? "")"
-//            magicContent.body = "承銷價:\(stock.sellPrice ?? "") 參考市價:\(stock.marketPrice ?? "") 溢價差:\(stock.profit ?? "")"
-//            magicContent.badge = 1
-//            let notifTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 20, repeats: false)
-//            let request = UNNotificationRequest(identifier: "1", content: magicContent, trigger: notifTrigger)
-//            
-//            UNUserNotificationCenter.current().add(request) { (error) in
-//                if error != nil {
-//                    print("\(error)")
-//                    completion(false)
-//                } else {
-//                    completion(true)
-//                }
-//            }
-//         }
-//        }
     
     func handleUserSetting() {
        let userDefault = UserDefaults.standard
         
        judgeStockMatchTheConditions()
+        
         if let isNeedRemind = userDefault.object(forKey: "isNeedRemind") as? Bool {
         settingNotify(isNeedRemind)
         }
@@ -119,13 +90,21 @@ class LuckyStockViewController: UIViewController {
         
     }
     
-    
+    override func viewWillAppear(_ animated: Bool) {
+        stockTabeleView.reloadData()
+    }
     
 
     func judgeStockMatchTheConditions() {
         
         let userDefault = UserDefaults.standard
         filterStocks = luckyStocks
+        
+        if UserDefaults.isHideOverDateSetting() {
+            filterStocks = filterStocks.filter({ (luckyStock:LuckyStock) -> Bool in
+            luckyStock.status?.rawValue != "expired"
+           })
+        }
         if let userSellPrice = userDefault.string(forKey: "sellPrice"), userSellPrice != "" {
             filterStocks = filterStocks.filter({ (luckyStock:LuckyStock) -> Bool in
                 if let sellPrice = Double(luckyStock.sellPrice!) {
@@ -139,11 +118,15 @@ class LuckyStockViewController: UIViewController {
                 if let profitPrice = Double(luckyStock.profit!) {
                     return  profitPrice >= Double(userProfitPrice)!
                 }
-                return false
+                return luckyStock.profit == "無資料" ? true : false
             })
         }
+        
+        
     }
     func settingNotify(_ needRemind:Bool) {
+        
+        
         
         if needRemind {
             if let remindTime = UserDefaults.standard.object(forKey: "remindTime") as? Date {
@@ -164,7 +147,7 @@ class LuckyStockViewController: UIViewController {
                 }
             }
         } else {
-            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+          UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["stockNotify"])
         }
         
     }
@@ -203,6 +186,17 @@ extension LuckyStockViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        
+        let stockDetailVC = StockDetailViewController()
+        stockDetailVC.stock = filterStocks[indexPath.row]
+        navigationController?.pushViewController(stockDetailVC, animated: true)
+        
+        
+    }
+    
     
 }
 

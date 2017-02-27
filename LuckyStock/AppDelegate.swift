@@ -19,14 +19,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var backgroundSessionCompletionHandler: (() -> Void)?
     var delegateController:LuckyStockViewController?
-
+    let luckyStockViewController = LuckyStockViewController()
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
        
         UNUserNotificationCenter.current().delegate = self
        
         window?.makeKeyAndVisible()
-        let luckyStockViewController = LuckyStockViewController()
+//        let luckyStockViewController = LuckyStockViewController()
         let navigationController = UINavigationController(rootViewController: luckyStockViewController)
         window?.rootViewController = navigationController
         UINavigationBar.appearance().barTintColor = UIColor.mainBlue
@@ -107,6 +107,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        luckyStockViewController.viewDidLoad()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
