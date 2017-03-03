@@ -9,20 +9,37 @@
 import UIKit
 import LBTAComponents
 import UserNotifications
+import GoogleMobileAds
 
-class LuckyStockViewController: UIViewController {
+class LuckyStockViewController: UIViewController,GADInterstitialDelegate {
 
     let cellId = "cellId"
     let headerId = "headevar"
+    var animateIsNeed = true
     var luckyStocks = [LuckyStock]()
     var filterStocks = [LuckyStock]()
-
+    var interstitial: GADInterstitial!
+    var clickNumber = 0
+    
     lazy var stockSettingLauncher: StockSettingLauncher = {
         let launcher = StockSettingLauncher()
         return launcher
     }()
     
-    
+    let handleingView:UIView = {
+        let view = UIView()
+        let label = UILabel()
+        let spinner = UIActivityIndicatorView.spinner
+        label.text = "資料處理中請稍候..."
+        view.addSubview(label)
+        view.addSubview(spinner)
+        label.anchorCenterSuperview()
+        spinner.anchor(label.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 50, heightConstant: 50)
+        spinner.anchorCenterXToSuperview()
+        spinner.startAnimating()
+        view.backgroundColor = UIColor(white: 1, alpha: 1)
+        return view
+    }()
     
     
     lazy var stockTabeleView: UITableView = {
@@ -36,28 +53,37 @@ class LuckyStockViewController: UIViewController {
         return tableView
     }()
     
-    
+    let bannerView = GADBannerView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName:UIColor.white]
         navigationController?.navigationBar.isTranslucent = false
-        navigationItem.title = "股票申購"
+        navigationItem.title = "抽股票"
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "設定", style: UIBarButtonItemStyle.plain, target: self, action: #selector(setting))
         navigationItem.rightBarButtonItem?.tintColor = UIColor.white
         
-        let backBarButtonItem = UIBarButtonItem(title: "回前頁", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
+        let backBarButtonItem = UIBarButtonItem(title: "回抽股票", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
         backBarButtonItem.setTitleTextAttributes([NSForegroundColorAttributeName:UIColor.white], for: .normal)
         self.navigationController?.navigationBar.tintColor = UIColor.white
         navigationItem.backBarButtonItem = backBarButtonItem
         
-        
+        UserDefaultFirstSetup()
         
         view.addSubview(stockTabeleView)
+        view.addSubview(bannerView)
+        
+        setupHandleingView()
         let myURLString = "http://histock.tw/stock/public.aspx"
         
+        
         Service.shareinstance.fetchWebStockData(baseurl: myURLString) { (stocks:[LuckyStock], error:Error?) in
+            self.handleingView.removeFromSuperview()
+            if error != nil {
+                self.handleingError()
+                return
+            }
             self.luckyStocks = stocks
             self.handleUserSetting()
         }
@@ -69,6 +95,44 @@ class LuckyStockViewController: UIViewController {
                 print("\(error?.localizedDescription)")
             }
         }
+        
+        // add Banna ads
+        bannerView.backgroundColor = UIColor.white
+        bannerView.adUnitID = "ca-app-pub-8818309556860374/3808980448"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+        
+        // create interstitial ads
+        interstitial = createAndLoadInterstitial()
+        
+    }
+    func UserDefaultFirstSetup() {
+        if UserDefaults.isDailyNeedRemind() == nil {
+            UserDefaults.standard.set(true, forKey: "isNeedRemind")
+            UserDefaults.standard.synchronize()
+        }
+        if UserDefaults.remindTime() == nil {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm"
+            formatter.locale = Locale(identifier: "zh_TW")
+            let initialTime = formatter.date(from: "09:00")
+            UserDefaults.standard.set(initialTime, forKey: "remindTime")
+            UserDefaults.standard.synchronize()
+            
+        }
+    }
+    
+    func setupHandleingView() {
+        view.addSubview(handleingView)
+        handleingView.fillSuperview()
+    }
+
+    func handleingError(){
+        let alertController = UIAlertController(title: "Oops! 出錯了", message: "網路連線異常請稍候再試", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alertController.addAction(okAction)
+        navigationController?.present(alertController, animated: true, completion: nil)
+        
     }
     
     func setting() {
@@ -152,11 +216,24 @@ class LuckyStockViewController: UIViewController {
         
     }
     
+    // regenerate interstitial request
+    func createAndLoadInterstitial() -> GADInterstitial {
+        let interstitial = GADInterstitial(adUnitID: "ca-app-pub-8818309556860374/5285713640")
+        interstitial.delegate = self
+        interstitial.load(GADRequest())
+        return interstitial
+    }
     
+    func interstitialWillDismissScreen(_ ad: GADInterstitial) {
+        interstitial = createAndLoadInterstitial()
+    }
+
     
     
     override func viewWillLayoutSubviews() {
-        stockTabeleView.fillSuperview()
+        bannerView.anchor(view.topAnchor, left: view.leftAnchor , bottom: nil, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
+    //    bannerView.anchorCenterXToSuperview()
+        stockTabeleView.anchor(bannerView.bottomAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 0)
     }
 
    
@@ -187,14 +264,36 @@ extension LuckyStockViewController: UITableViewDataSource, UITableViewDelegate {
         return 100
     }
     
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if animateIsNeed {
+            let frame = cell.frame
+            cell.frame = CGRect(x: 0, y: self.stockTabeleView.frame.height, width: frame.width, height: frame.height)
+            UIView.animate(withDuration: 0.75, delay: 0.0, options: UIViewAnimationOptions.transitionCrossDissolve, animations: { () -> Void in
+                cell.frame = frame
+            }, completion: {(bool:Bool) in
+                if bool {
+                    self.animateIsNeed = false
+                }
+            } )
+        }
+
+    }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        if interstitial.isReady , clickNumber == 3 {
+            UIWindow.removeStatusBar()
+            interstitial.present(fromRootViewController: self)
+            isAdsshown = true
+            clickNumber = 0
+            //            UIWindow.addStatusBar()
+        }
         
         let stockDetailVC = StockDetailViewController()
         stockDetailVC.stock = filterStocks[indexPath.row]
         navigationController?.pushViewController(stockDetailVC, animated: true)
         
-        
+        clickNumber += 1
+        UserDefaults.standard.set(clickNumber, forKey: "clickNumber")
     }
     
     

@@ -17,13 +17,20 @@ class StockDetailViewController:UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = "申購資訊"
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "公司資料", style: UIBarButtonItemStyle.plain, target: self, action: #selector(showCompanyInfo))
         navigationItem.rightBarButtonItem?.tintColor = UIColor.white
         
-        let backBarButtonItem = UIBarButtonItem(title: "回前頁", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
+        let backBarButtonItem = UIBarButtonItem(title: "回申購資訊", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
         backBarButtonItem.setTitleTextAttributes([NSForegroundColorAttributeName:UIColor.white], for: .normal)
         self.navigationController?.navigationBar.tintColor = UIColor.white
         navigationItem.backBarButtonItem = backBarButtonItem
+        
+        if isAdsshown {
+            UIWindow.addStatusBar()
+        }
+        isAdsshown = false
+        
     }
     
     var stock:LuckyStock? {
@@ -34,7 +41,7 @@ class StockDetailViewController:UIViewController {
             let url = URL(string:imageUrlString)
             let urlRequest = URLRequest(url: url!)
             stockWebView.loadRequest(urlRequest)
-            print("here")
+          
             
         }
         
@@ -88,7 +95,7 @@ extension StockDetailViewController: UITableViewDataSource, UITableViewDelegate 
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return 11
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -96,8 +103,8 @@ extension StockDetailViewController: UITableViewDataSource, UITableViewDelegate 
         cell.cellIndex = indexPath.row
         cell.stock = stock
         cell.delegateController = self
-        if let stockNumber = stock?.number, let isNeedRemind = UserDefaults.standard.object(forKey: stockNumber) as? Bool {
-         cell.isNeedRemind = isNeedRemind
+        if let stockNumber = stock?.number, let archivedData = UserDefaults.standard.object(forKey: stockNumber) as? Data, let isNeedRemindDict = NSKeyedUnarchiver.unarchiveObject(with: archivedData) as? [Int:Bool] {
+         cell.isNeedRemindDict = isNeedRemindDict
         }
         
         return cell
@@ -120,7 +127,6 @@ extension StockDetailViewController: UIWebViewDelegate{
     func webViewDidFinishLoad(_ webView: UIWebView) {
         
         myActivityIndicator.stopAnimating()
-        print("here")
         let contentSize:CGSize = stockWebView.scrollView.contentSize
         let viewSize:CGSize = self.view.bounds.size
         

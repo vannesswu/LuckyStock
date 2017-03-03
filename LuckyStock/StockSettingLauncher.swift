@@ -440,7 +440,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         userDefault.synchronize()
         userDefault.set(datePicker.date, forKey: "remindTime")
         userDefault.synchronize()
-        
+        delegateController?.animateIsNeed = true
         delegateController?.handleUserSetting()
         handleDismiss()
     }

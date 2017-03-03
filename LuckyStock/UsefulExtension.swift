@@ -173,4 +173,45 @@ extension UserDefaults {
         }
         return false
     }
+    static func isDailyNeedRemind() -> Bool? {
+        if let bool = UserDefaults.standard.object(forKey: "isNeedRemind") as? Bool {
+            return bool
+        }
+        return nil
+    }
+    static func remindTime() -> Date? {
+        if let remindTime = UserDefaults.standard.object(forKey: "remindTime") as? Date {
+            return remindTime
+        }
+        return nil
+    }
+    static func clickNumber() -> Int {
+        if let clickNumber = UserDefaults.standard.object(forKey: "clickNumber") as? Int {
+            return clickNumber
+        }
+        return 0
+    }
+    
+}
+
+
+extension UIWindow {
+    static func addStatusBar(){
+        let statusBarBackgroundView = UIView()
+        statusBarBackgroundView.backgroundColor = UIColor.darkBlue
+        if let window = UIApplication.shared.keyWindow {
+            window.addSubview(statusBarBackgroundView)
+            window.addConstraintsWithFormat("H:|[v0]|", views: statusBarBackgroundView)
+            window.addConstraintsWithFormat("V:|[v0(20)]", views: statusBarBackgroundView)
+        }
+    }
+    static func removeStatusBar(){
+        if let window = UIApplication.shared.keyWindow {
+            for view in window.subviews {
+                if view.backgroundColor == UIColor.darkBlue {
+                    view.removeFromSuperview()
+                }
+            }
+        }
+   }
 }

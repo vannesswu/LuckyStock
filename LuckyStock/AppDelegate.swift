@@ -13,6 +13,9 @@ import Firebase
 import FirebaseInstanceID
 import FirebaseMessaging
 
+var clickNumber:Int = 0
+var isAdsshown = false
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     let gcmMessageIDKey = "gcm.message_id"
@@ -20,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var backgroundSessionCompletionHandler: (() -> Void)?
     var delegateController:LuckyStockViewController?
     let luckyStockViewController = LuckyStockViewController()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
        
@@ -72,7 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // [END register_for_notifications]
         FIRApp.configure()
-        
+        GADMobileAds.configure(withApplicationID: "ca-app-pub-8818309556860374~8378780841")
+      //  adsNumber = Int(arc4random_uniform(2))+2
         // [START add_token_refresh_observer]
         // Add observer for InstanceID token refresh callback.
         NotificationCenter.default.addObserver(self,
@@ -108,6 +113,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         UIApplication.shared.applicationIconBadgeNumber = 0
+        clickNumber = UserDefaults.clickNumber()
         luckyStockViewController.viewDidLoad()
     }
 

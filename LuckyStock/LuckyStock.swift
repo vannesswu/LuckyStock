@@ -35,7 +35,7 @@ class LuckyStock {
             separateString = stock.components(separatedBy: "</td><td>")
         }
         
-        self.startDate = separateString[0].substring(from: separateString[0].characters.count-10)
+        self.startDate = separateString[0].substring(from: separateString[0].characters.count-5)
         
         self.number = separateString[1].substring(with: 21..<25)
         

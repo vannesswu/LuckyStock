@@ -17,6 +17,14 @@ class SecurityCompanyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+       let backBarbutton = UIBarButtonItem(title: "前一頁", style: UIBarButtonItemStyle.plain, target: self, action: #selector(goback))
+        backBarbutton.tintColor = UIColor.white
+        let forwardBarbutton = UIBarButtonItem(title: "下一頁", style: UIBarButtonItemStyle.plain, target: self, action: #selector(forward))
+        forwardBarbutton.tintColor = UIColor.white
+        navigationItem.rightBarButtonItems = [forwardBarbutton,backBarbutton]
+        
+        
     }
     var webView:UIWebView!
     override func viewWillLayoutSubviews() {
@@ -32,6 +40,13 @@ class SecurityCompanyViewController: UIViewController {
         webView?.loadRequest(urlRequest)
         }
    //     myActivityIndicator.startAnimating()
+    }
+    
+    func goback(){
+        webView.goBack()
+    }
+    func forward() {
+        webView.goForward()
     }
 }
 

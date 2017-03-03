@@ -15,12 +15,16 @@ class StockDetailCell: UITableViewCell {
     
     var cellIndex:Int = 0
     var delegateController:StockDetailViewController?
-    var isNeedRemind = false {
+
+    var isNeedRemindDict = [2:false, 3:false, 4:false] {
         didSet {
-        let color = isNeedRemind ? UIColor.red : UIColor.darkGray
-        alarmButton.tintColor = color
+            if let status = isNeedRemindDict[cellIndex] {
+            let color = status ? UIColor.red : UIColor.darkGray
+            alarmButton.tintColor = color
+            }
         }
     }
+    
     var stock:LuckyStock? {
         
         didSet {
@@ -40,30 +44,34 @@ class StockDetailCell: UITableViewCell {
                     titleLabel.text = "申購期間:"
                     stockInfoLabel.text = "\(stock?.during ?? "")"
                 case 3 :
-                    alarmButton.isHidden = true
+                    alarmButton.isHidden = false
+                    titleLabel.text = "抽籤日期:"
+                    stockInfoLabel.text = "\(stock?.startDate ?? "")"
+                case 4 :
+                    alarmButton.isHidden = false
                     titleLabel.text = "撥券日期:"
                     stockInfoLabel.text = "\(stock?.givenDate ?? "")"
-                case 4 :
+                case 5 :
                     alarmButton.isHidden = true
                     titleLabel.text = "承銷張數:"
                     stockInfoLabel.text = "\(stock?.amount ?? "")"
-                case 5 :
+                case 6 :
                     alarmButton.isHidden = true
                     titleLabel.text = "承銷價:"
                     stockInfoLabel.text = "\(stock?.sellPrice ?? "")"
-                case 6 :
+                case 7 :
                     alarmButton.isHidden = true
                     titleLabel.text = "參考市價:"
                     stockInfoLabel.text = "\(stock?.marketPrice ?? "")"
-                case 7 :
+                case 8 :
                     alarmButton.isHidden = true
                     titleLabel.text = "申購張數:"
                     stockInfoLabel.text = "\(stock?.numberOfStockCanBuy ?? "")"
-                case 8 :
+                case 9 :
                     alarmButton.isHidden = true
                     titleLabel.text = "總合格件:"
                     stockInfoLabel.text = "\(stock?.numberOfPeople ?? "")"
-                case 9 :
+                case 10 :
                     titleLabel.text = "中籤率:"
                     alarmButton.isHidden = true
                     stockInfoLabel.text = "\(stock?.bingoRate ?? "") %"
@@ -120,19 +128,71 @@ class StockDetailCell: UITableViewCell {
     }
     
     func settingAlarm() {
-        isNeedRemind = !isNeedRemind
-        var alertTitle = ""
+        var notifyTitle = ""
+        var notifyBody = ""
+        var startDateString = ""
         var alertMessage = ""
+        var alertTitle = "已新增通知"
+        var isNeedRemind = false
         guard let stockNumber = stock?.number else { return }
-        if isNeedRemind {
+
+        if let archivedData = UserDefaults.standard.object(forKey: stockNumber) as? Data, let remindDict = NSKeyedUnarchiver.unarchiveObject(with: archivedData) as? [Int:Bool] {
+            isNeedRemindDict  = remindDict
+        }
+        
+        switch cellIndex {
+        case 2:
+            notifyTitle = "\(stock?.name ?? "")申購通知"
+            notifyBody = "申購期間\(stock?.during ?? "") "
+            if let dateComponents = stock?.during?.components(separatedBy: "~") {
+                startDateString = dateComponents[0]
+            }
+     //       isNeedRemindArray[0] = !isNeedRemindArray[0]
+     //       isNeedRemind = isNeedRemindArray[0]
+            if let  status = isNeedRemindDict[cellIndex] {
+            isNeedRemindDict[cellIndex] = !status
+            isNeedRemind = !status
+            }
+            
+        case 3:
+            notifyTitle = "\(stock?.name ?? "")抽籤日通知"
+            notifyBody = "抽籤期間\(stock?.startDate ?? "") "
+            if let date = stock?.startDate {
+            startDateString = date
+            }
+    //        isNeedRemindArray[1] = !isNeedRemindArray[1]
+   //         isNeedRemind = isNeedRemindArray[1]
+            if let  status = isNeedRemindDict[cellIndex] {
+                isNeedRemindDict[cellIndex] = !status
+                isNeedRemind = !status
+            }
+        case 4:
+            notifyTitle = "\(stock?.name ?? "")撥券日通知"
+            notifyBody = "撥券日期\(stock?.givenDate ?? "") "
+            if let date = stock?.givenDate {
+                startDateString = date
+            }
+     //       isNeedRemindArray[2] = !isNeedRemindArray[2]
+     //       isNeedRemind = isNeedRemindArray[2]
+            if let  status = isNeedRemindDict[cellIndex] {
+                isNeedRemindDict[cellIndex] = !status
+                isNeedRemind = !status
+            }
+            
+        default:
+            break
+        }
+        
+     //   isNeedRemind = !isNeedRemind
+            if isNeedRemind {
             if let remindTime = UserDefaults.standard.object(forKey: "remindTime") as? Date {
                 let timeFormatter = DateFormatter()
                 timeFormatter.dateFormat = "HH:mm"
                 let  remindTimeString = timeFormatter.string(from: remindTime )
                 
                 let stockContent = UNMutableNotificationContent()
-                stockContent.title = "\(stock?.name ?? "")申購通知"
-                stockContent.body = "申購期間\(stock?.during ?? "") "
+                stockContent.title = notifyTitle
+                stockContent.body = notifyBody
                 let currentBadgeNumber = UIApplication.shared.applicationIconBadgeNumber + 1
                 stockContent.badge = currentBadgeNumber as NSNumber?
                 
@@ -144,27 +204,25 @@ class StockDetailCell: UITableViewCell {
                 let today = formatter.string(from: date as Date)
                 let componentInToday = today.components(separatedBy: "/")
                 let yearInToday = componentInToday[0]
+                let combineDateString = "\(yearInToday)/\(startDateString) \(remindTimeString)"
+                guard let startDate = formatter.date(from: combineDateString) else { return }
                 
-                if let duringDate = stock?.during?.components(separatedBy: "~") {
-                    let startDateString = duringDate[0]
-                    let combineDateString = "\(yearInToday)/\(startDateString) \(remindTimeString)"
-                    guard let startDate = formatter.date(from: combineDateString) else { return }
-                    alertTitle = "已新增通知"
-                    alertMessage = "將在\(combineDateString) 發送 \(stock?.name ?? "") 申購提醒"
-                    let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startDate)
-                    let notifTrigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-                    
-                    let request = UNNotificationRequest(identifier: "\(stockNumber)Notify", content: stockContent, trigger: notifTrigger)
-                    UNUserNotificationCenter.current().add(request) { (error) in
-                        if error != nil {
-                            print("\(error)")
-                        }
+                alertMessage = "將在\(combineDateString) 發送 \(notifyTitle)"
+     //           alertMessage = alertMessages
+                let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: startDate)
+                let notifTrigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+                
+                let request = UNNotificationRequest(identifier: "\(notifyTitle)Notify", content: stockContent, trigger: notifTrigger)
+                UNUserNotificationCenter.current().add(request) { (error) in
+                    if error != nil {
+                        print("\(error)")
                     }
+                    
                 }
             }
         } else {
             alertTitle = "已取消通知"
-              UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["\(stockNumber)Notify"])
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["\(notifyTitle)Notify"])
         }
         
         
@@ -172,8 +230,10 @@ class StockDetailCell: UITableViewCell {
         let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
         alertController.addAction(okAction)
         delegateController?.present(alertController, animated: true, completion: nil)
-        UserDefaults.standard.set(isNeedRemind, forKey: stockNumber)
+        let data = NSKeyedArchiver.archivedData(withRootObject: isNeedRemindDict)
+        UserDefaults.standard.set(data , forKey: stockNumber)
         UserDefaults.standard.synchronize()
+        
 
         
     }

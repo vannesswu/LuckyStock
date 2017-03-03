@@ -24,6 +24,7 @@ class CompanyInfoViewController:UIViewController {
         super.viewWillLayoutSubviews()
         webView = UIWebView()
         webView.scalesPageToFit = true
+        webView.delegate = self
         view.addSubview(webView)
         view.addSubview(myActivityIndicator)
         webView.fillSuperview()
