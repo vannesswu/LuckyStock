@@ -45,6 +45,17 @@ extension String {
         }))
         return nString
     }
+//    func character() -> String {
+//        let nString = String(self.characters.filter({ (character:Character) -> Bool in
+//            if character != "" && character <= "9" || character == "."{
+//                return true
+//            } else {return false }
+//        }))
+//        return nString
+//    }
+    
+    
+    
 }
 
 extension UIColor {

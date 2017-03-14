@@ -44,8 +44,8 @@ class LuckyStock {
             self.name = name.substring(to: (name.characters.count)-5)
         }
         
-        self.reason = separateString[2]
-        
+        self.reason = separateString[2].replacingOccurrences(of: " ", with: "")
+        self.reason = self.reason?.replacingOccurrences(of: "\r\n", with:"")
         self.during = separateString[3].substring(with: 1..<12)
         self.status = judgeStatus(during: self.during)
         self.givenDate = separateString[3].substring(from: separateString[3].characters.count - 4)
@@ -73,9 +73,9 @@ class LuckyStock {
                 self.profit = "無資料"
             }
         }
-        self.numberOfStockCanBuy = separateString[7]
-        self.numberOfPeople = separateString[8]
-        self.bingoRate = separateString[9]
+        self.numberOfStockCanBuy = separateString[8].return0to9()
+        self.numberOfPeople = separateString[9]
+        self.bingoRate = separateString[10]
         
     }
     

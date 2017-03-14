@@ -150,7 +150,7 @@ class StockCell: UITableViewCell {
         addSubview(profitLabel)
         addSubview(startDateLabel)
         addSubview(duringDateLabel)
-        addSubview(buyButton)
+    //    addSubview(buyButton)
         
         
         if let window = UIApplication.shared.keyWindow {
@@ -161,10 +161,10 @@ class StockCell: UITableViewCell {
         sellPriceLabel.anchor(topAnchor, left: nameLabel.rightAnchor, bottom: bottomAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 40, rightConstant: 0, widthConstant: labelWidth, heightConstant: 0)
         marketPriceLabel.anchor(sellPriceLabel.topAnchor, left: sellPriceLabel.rightAnchor, bottom: sellPriceLabel.bottomAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: labelWidth, heightConstant: 0)
         profitLabel.anchor(sellPriceLabel.topAnchor, left: marketPriceLabel.rightAnchor, bottom: sellPriceLabel.bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 0)
-        duringDateLabel.anchor(sellPriceLabel.bottomAnchor, left: nameLabel.rightAnchor, bottom: nil, right: profitLabel.leftAnchor, topConstant: 0, leftConstant: 10, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 15)
-        startDateLabel.anchor(duringDateLabel.bottomAnchor, left: duringDateLabel.leftAnchor, bottom: bottomAnchor, right: profitLabel.leftAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: 15)
+        duringDateLabel.anchor(sellPriceLabel.bottomAnchor, left: nameLabel.rightAnchor, bottom: nil, right: rightAnchor, topConstant: 0, leftConstant: 10, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 15)
+        startDateLabel.anchor(duringDateLabel.bottomAnchor, left: duringDateLabel.leftAnchor, bottom: bottomAnchor, right: rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: 15)
         }
-        buyButton.anchor(profitLabel.bottomAnchor, left: profitLabel.leftAnchor, bottom: bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: 0, heightConstant: 35)
+     //   buyButton.anchor(profitLabel.bottomAnchor, left: profitLabel.leftAnchor, bottom: bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: 0, heightConstant: 35)
         
         
     

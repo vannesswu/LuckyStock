@@ -30,7 +30,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         return view
     }()
     var halfWidth:CGFloat = 0
-
+    var scaleFactor:CGFloat = 1.0
     
     
     // MARK: show mainView
@@ -43,6 +43,8 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         
         if let window = UIApplication.shared.keyWindow {
             
+            scaleFactor = window.frame.width > 500 ? 1 : 0.8
+
             blackView.backgroundColor = UIColor(white: 0, alpha: 0.5)
             blackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDismiss)))
             window.addSubview(blackView)
@@ -53,7 +55,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
             halfWidth = SettingView.frame.width/2
             setupHeaderView()
             setupFilterView()
-            setupCompanyView()
+        //    setupCompanyView()
             setupRemindView()
             setupDoneButton()
             
@@ -150,14 +152,14 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         let separatorView = SeparatorView()
         filterView = UIView()
         SettingView.addSubview(filterView)
-        filterView.anchor(headerView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 160)
+        filterView.anchor(headerView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 160  * scaleFactor)
         
         // setting title view
         let titleLabel = HearderLabel()
         titleLabel.text = "篩選條件"
         titleLabel.textAlignment = .center
         filterView.addSubview(titleLabel)
-        titleLabel.anchor(filterView.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        titleLabel.anchor(filterView.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40  * scaleFactor)
         titleLabel.anchorCenterXToSuperview()
         
         // setting filter condition view
@@ -175,11 +177,11 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         filterView.addSubview(isHideOverDateStockLabel)
         filterView.addSubview(confirmButton)
         filterView.addSubview(separatorView)
-        sellPriceLabel.anchor(titleLabel.bottomAnchor, left: filterView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
-        sellTextfield.anchor(sellPriceLabel.topAnchor, left: sellPriceLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
+        sellPriceLabel.anchor(titleLabel.bottomAnchor, left: filterView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40 * scaleFactor)
+        sellTextfield.anchor(sellPriceLabel.topAnchor, left: sellPriceLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40 * scaleFactor)
         profitLabel.anchor(sellPriceLabel.bottomAnchor, left: filterView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
-        profitTextfield.anchor(profitLabel.topAnchor, left: profitLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
-        isHideOverDateStockLabel.anchor(profitLabel.bottomAnchor, left: profitLabel.leftAnchor, bottom: filterView.bottomAnchor, right: profitLabel.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        profitTextfield.anchor(profitLabel.topAnchor, left: profitLabel.rightAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40 * scaleFactor)
+        isHideOverDateStockLabel.anchor(profitLabel.bottomAnchor, left: profitLabel.leftAnchor, bottom: filterView.bottomAnchor, right: profitLabel.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40 * scaleFactor)
         confirmButton.anchor(isHideOverDateStockLabel.topAnchor, left: isHideOverDateStockLabel.rightAnchor, bottom: nil , right: nil, topConstant: 5, leftConstant: halfWidth/2-12.5, bottomConstant: 0, rightConstant: 0, widthConstant: 25, heightConstant: 25)
         
         
@@ -226,18 +228,18 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         let separatorView = SeparatorView()
 
         SettingView.addSubview(companyView)
-        companyView.anchor(filterView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 100)
+        companyView.anchor(filterView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 100 * scaleFactor)
         
         companyView.addSubview(companyHeaderLabel)
         companyHeaderLabel.text = "選擇證卷商"
-        companyHeaderLabel.anchor(companyView.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        companyHeaderLabel.anchor(companyView.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40 * scaleFactor)
         companyHeaderLabel.anchorCenterXToSuperview()
         
         
         // company label and menu
         companyView.addSubview(menuButton)
         companyView.addSubview(separatorView)
-        menuButton.anchor(companyHeaderLabel.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 50)
+        menuButton.anchor(companyHeaderLabel.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 50 * scaleFactor)
         menuButton.anchorCenterXToSuperview()
         
         separatorView.anchor(nil, left: companyView.leftAnchor, bottom: companyView.bottomAnchor, right: companyView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
@@ -291,12 +293,12 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
     }
     func setupCompanyPickerView(){
         menuView.addSubview(companyPickerView)
-        companyPickerView.anchor(menuView.topAnchor, left: menuView.leftAnchor, bottom: nil, right: menuView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 150)
+        companyPickerView.anchor(menuView.topAnchor, left: menuView.leftAnchor, bottom: nil, right: menuView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 150 * scaleFactor)
         
     }
     func setupSelectedcompanyButton() {
         menuView.addSubview(selectCompanyButton)
-        selectCompanyButton.anchor(companyPickerView.bottomAnchor, left: nil, bottom: menuView.bottomAnchor, right: nil, topConstant: 10, leftConstant: 0, bottomConstant: 10, rightConstant: 0, widthConstant: 70, heightConstant: 30)
+        selectCompanyButton.anchor(companyPickerView.bottomAnchor, left: nil, bottom: menuView.bottomAnchor, right: nil, topConstant: 10, leftConstant: 0, bottomConstant: 10, rightConstant: 0, widthConstant: 70, heightConstant: 30 * scaleFactor)
         selectCompanyButton.anchorCenterXToSuperview()
     }
     
@@ -360,23 +362,23 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
     func setupRemindView() {
         let separatorView = SeparatorView()
         SettingView.addSubview(remindView)
-        remindView.anchor(companyView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 140)
+        remindView.anchor(filterView.bottomAnchor, left: SettingView.leftAnchor, bottom: nil, right: SettingView.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 140 * scaleFactor)
         
         remindView.addSubview(remindHeaderLabel)
         remindView.addSubview(remindSwitch)
         remindSwitch.addTarget(self, action: #selector(switchChange), for: .valueChanged)
         remindHeaderLabel.text = "每日提醒"
-        remindHeaderLabel.anchor(remindView.topAnchor, left: remindView.leftAnchor , bottom: nil, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
-        remindSwitch.anchor(remindHeaderLabel.topAnchor, left: nil , bottom: nil, right: remindView.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 15, widthConstant: 40, heightConstant: 40)
+        remindHeaderLabel.anchor(remindView.topAnchor, left: remindView.leftAnchor , bottom: nil, right: nil, topConstant: 5, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: halfWidth, heightConstant: 40)
+        remindSwitch.anchor(remindHeaderLabel.topAnchor, left: nil , bottom: nil, right: remindView.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 15, widthConstant: 40, heightConstant: 40 * scaleFactor)
 
        
         remindView.addSubview(datePicker)
         datePicker.addTarget(self, action: #selector(datePickerChanged), for: .valueChanged)
-        datePicker.anchor(remindHeaderLabel.bottomAnchor, left: remindView.leftAnchor, bottom: nil, right: remindView.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 90)
+        datePicker.anchor(remindHeaderLabel.bottomAnchor, left: remindView.leftAnchor, bottom: nil, right: remindView.rightAnchor, topConstant: 10, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 140 * scaleFactor)
         
         
         remindView.addSubview(separatorView)
-        separatorView.anchor(nil, left: remindView.leftAnchor, bottom: remindView.bottomAnchor, right: remindView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
+        separatorView.anchor(nil, left: remindView.leftAnchor, bottom: datePicker.bottomAnchor, right: remindView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         
     
     }
@@ -411,7 +413,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
     
     func setupDoneButton() {
         SettingView.addSubview(doneButton)
-        doneButton.anchor(remindView.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 20, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 40)
+        doneButton.anchor(datePicker.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 20, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 40 * scaleFactor)
         doneButton.anchorCenterXToSuperview()
         
         
