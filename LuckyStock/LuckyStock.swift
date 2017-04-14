@@ -37,11 +37,13 @@ class LuckyStock {
         
         self.startDate = separateString[0].substring(from: separateString[0].characters.count-5)
         
-        self.number = separateString[1].substring(with: 21..<25)
+     //   self.number = separateString[1].substring(with: 21..<25)
         
         if let range = separateString[1].range(of: "&nbsp;") {
+            let number = separateString[1].substring(to: (range.lowerBound))
+            self.number = number.substring(from: number.characters.count-4)
             let name = separateString[1].substring(from: (range.upperBound))
-            self.name = name.substring(to: (name.characters.count)-5)
+            self.name = name.substring(to: (name.characters.count) - (name.contains("</a>") ? 5 : 1))
         }
         
         self.reason = separateString[2].replacingOccurrences(of: " ", with: "")
@@ -81,7 +83,7 @@ class LuckyStock {
     
     func judgeStatus(during:String?)-> StockStatus {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
+        formatter.dateFormat = "yyyy/MM/dd HH"
         formatter.locale = Locale(identifier: "zh_TW")
         let date = Date()
         let today = formatter.string(from: date as Date)
@@ -90,9 +92,10 @@ class LuckyStock {
         
         if let duringDate = self.during?.components(separatedBy: "~")   {      let startDateString = duringDate[0]
         let endDateString = duringDate[1]
-        let startDate = formatter.date(from: "\(yearInToday)/\(startDateString)")
-        let endDate = formatter.date(from: "\(yearInToday)/\(endDateString)")
-        
+
+        let startDate = formatter.date(from: "\(yearInToday)/\(startDateString) 00")
+        let endDate = formatter.date(from: "\(yearInToday)/\(endDateString) 14" )
+            
         if date  < startDate! {
             return StockStatus.notyet
         } else if date > startDate! && date < endDate! {

@@ -43,7 +43,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
         
         if let window = UIApplication.shared.keyWindow {
             
-            scaleFactor = window.frame.width > 500 ? 1 : 0.8
+            scaleFactor = window.frame.height > 500 ? 1 : 0.8
 
             blackView.backgroundColor = UIColor(white: 0, alpha: 0.5)
             blackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDismiss)))

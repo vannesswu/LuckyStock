@@ -20,6 +20,7 @@ class LuckyStockViewController: UIViewController,GADInterstitialDelegate {
     var filterStocks = [LuckyStock]()
     var interstitial: GADInterstitial!
     var clickNumber = 0
+    var firstViewLoad = true
     
     lazy var stockSettingLauncher: StockSettingLauncher = {
         let launcher = StockSettingLauncher()
@@ -77,7 +78,7 @@ class LuckyStockViewController: UIViewController,GADInterstitialDelegate {
         setupHandleingView()
         let myURLString = "http://histock.tw/stock/public.aspx"
         
-        
+        if firstViewLoad {
         Service.shareinstance.fetchWebStockData(baseurl: myURLString) { (stocks:[LuckyStock], error:Error?) in
             self.handleingView.removeFromSuperview()
             if error != nil {
@@ -86,6 +87,7 @@ class LuckyStockViewController: UIViewController,GADInterstitialDelegate {
             }
             self.luckyStocks = stocks
             self.handleUserSetting()
+         }
         }
         // 1 Request permission
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
@@ -104,6 +106,7 @@ class LuckyStockViewController: UIViewController,GADInterstitialDelegate {
         
         // create interstitial ads
         interstitial = createAndLoadInterstitial()
+        firstViewLoad = false
         
     }
     func UserDefaultFirstSetup() {
