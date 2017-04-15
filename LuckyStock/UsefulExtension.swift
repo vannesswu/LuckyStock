@@ -11,15 +11,18 @@ import LBTAComponents
 
 extension String {
     func index(from: Int) -> Index {
+        guard from <= characters.count else { return startIndex }
         return self.index(startIndex, offsetBy: from)
     }
     
     func substring(from: Int) -> String {
+        guard from <= characters.count else { return "" }
         let fromIndex = index(from: from)
         return substring(from: fromIndex)
     }
     
     func substring(to: Int) -> String {
+        guard to <= characters.count else { return "" }
         let toIndex = index(from: to)
         return substring(to: toIndex)
     }
@@ -27,6 +30,7 @@ extension String {
     func substring(with r: Range<Int>) -> String {
         let startIndex = index(from: r.lowerBound)
         let endIndex = index(from: r.upperBound)
+        guard distance(from: startIndex, to: endIndex) <= characters.count else { return "" }
         return substring(with: startIndex..<endIndex)
     }
     func return1to9(with str:String) -> String {
@@ -45,6 +49,12 @@ extension String {
         }))
         return nString
     }
+    func checkIfOutOfRange(index:Int) {
+        
+        
+        
+    }
+    
 //    func character() -> String {
 //        let nString = String(self.characters.filter({ (character:Character) -> Bool in
 //            if character != "" && character <= "9" || character == "."{

@@ -37,7 +37,7 @@ class LuckyStock {
         
         self.startDate = separateString[0].substring(from: separateString[0].characters.count-5)
         
-     //   self.number = separateString[1].substring(with: 21..<25)
+        self.number = separateString[1].substring(with: 21..<25)
         
         if let range = separateString[1].range(of: "&nbsp;") {
             let number = separateString[1].substring(to: (range.lowerBound))
