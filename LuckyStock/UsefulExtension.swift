@@ -28,10 +28,11 @@ extension String {
     }
     
     func substring(with r: Range<Int>) -> String {
-        let startIndex = index(from: r.lowerBound)
-        let endIndex = index(from: r.upperBound)
-        guard distance(from: startIndex, to: endIndex) <= characters.count else { return "" }
-        return substring(with: startIndex..<endIndex)
+        guard r.upperBound <= characters.count else { return ""}
+        let startingIndex = index(from: r.lowerBound)
+        let endingIndex = index(from: r.upperBound)
+        guard distance(from: startingIndex, to: endingIndex) <= characters.count else { return "" }
+        return substring(with: startingIndex..<endingIndex)
     }
     func return1to9(with str:String) -> String {
         let nString = String(str.characters.filter({ (character:Character) -> Bool in
