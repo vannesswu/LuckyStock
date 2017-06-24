@@ -100,8 +100,8 @@ class LuckyStockViewController: UIViewController,GADInterstitialDelegate {
         
         // add Banna ads
         bannerView.backgroundColor = UIColor.white
-       // bannerView.adUnitID = "ca-app-pub-8818309556860374/3808980448"
-        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.adUnitID = "ca-app-pub-8818309556860374/3808980448"
+       // bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
         

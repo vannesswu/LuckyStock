@@ -38,7 +38,8 @@ class Service: NSObject {
             print("Error: \(baseurl) doesn't seem to be a valid URL")
             return
         }
-        URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
+        URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
             
             if error != nil {
                 print(error ?? "")
