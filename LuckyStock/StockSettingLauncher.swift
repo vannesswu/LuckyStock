@@ -63,7 +63,7 @@ class StockSettingLauncher: NSObject, UITextFieldDelegate {
                 
                 self.blackView.alpha = 1
                 
-                self.SettingView.frame = CGRect(x: window.frame.width/2, y: 0, width: self.SettingView.frame.width, height: self.SettingView.frame.height)
+                self.SettingView.frame = CGRect(x: window.frame.width/2, y: iphoneXHeight, width: self.SettingView.frame.width, height: self.SettingView.frame.height)
                 
             }, completion: nil)
         }
